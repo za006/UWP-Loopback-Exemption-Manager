@@ -1,5 +1,5 @@
 # Project Description
-
+26年ai互动得出的一个 中文版本
 This project is enhancement of [Windows Loopback Exemption Manager](https://github.com/tiagonmas/Windows-Loopback-Exemption-Manager).
 
 GUI to enable Loopback Exemptions for Universal Windows Apps and Windows 8, 8.1, 10 Modern UI Apps.
