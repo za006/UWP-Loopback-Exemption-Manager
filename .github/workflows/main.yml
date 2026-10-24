@@ -1,8 +1,6 @@
-name: build
+name: build-and-release
 
 on:
-  push:
-    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -22,10 +20,27 @@ jobs:
         run: dotnet restore
 
       - name: Publish
-        run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
+        run: >
+          dotnet publish -c Release -r win-x64
+          --self-contained true
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Pack release
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Get-ChildItem -Recurse -Path . -Filter *.exe |
+            Where-Object { $_.FullName -match '\\bin\\Release\\' } |
+            Copy-Item -Destination release -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: release
-          path: '**/bin/Release/**/publish/'
+          tag_name: 2026A
+          name: 2026A
+          body: 自动编译发布
+          files: release/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
